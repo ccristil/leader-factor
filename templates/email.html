@@ -1,7 +1,6 @@
 {% set team_pct = (data.team_completion * 100) | round | int %}
 {% set company_pct = (data.company_completion * 100) | round | int %}
 {% set pts = team_pct - company_pct %}
-{% set status_color = {"active": "#2A77EA", "completed": "#659940", "abandoned": "#80838D"} %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,7 +12,7 @@
 <body style="margin:0;padding:0;background:#FFFEF8;font-family:Helvetica,Arial,sans-serif;color:#101322;">
   <!-- preview text -->
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-    Your team is at {{ data.team_completion | pct }} check-in completion — company average is {{ data.company_completion | pct }}.
+    Your team is at {{ data.team_completion | pct }} check-in rate — company average is {{ data.company_completion | pct }}.
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFEF8;">
@@ -37,7 +36,7 @@
             <div style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:64px;line-height:1;letter-spacing:-0.03em;margin:14px 0 6px;">
               {{ team_pct }}%
             </div>
-            <div style="font-size:14px;color:#4E5160;margin-bottom:12px;">team check-in completion</div>
+            <div style="font-size:14px;color:#4E5160;margin-bottom:12px;">team check-in rate</div>
 
             {% if pts > 0 %}
               <span style="display:inline-block;font-size:13px;font-weight:600;color:#4E7333;background:rgba(78,115,51,0.10);border-radius:2000px;padding:6px 13px;">&#9650; {{ pts }} pt{{ '' if pts == 1 else 's' }} above company average</span>
@@ -64,8 +63,7 @@
               <td style="vertical-align:middle;">
                 <div style="font-size:15px;font-weight:600;">{{ r.name }}</div>
                 <div style="font-size:12.5px;color:#80838D;margin-top:2px;">
-                  <span style="color:{{ status_color[r.status] }};">&#9679;</span>
-                  {{ r.status }} · {{ r.check_ins }} check-in{{ '' if r.check_ins == 1 else 's' }}
+                  {{ r.check_ins }} check-in{{ '' if r.check_ins == 1 else 's' }}
                 </div>
               </td>
               <td align="right" style="vertical-align:middle;white-space:nowrap;">

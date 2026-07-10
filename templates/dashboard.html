@@ -28,32 +28,25 @@
   <p>{{ data.manager_name }}'s team · {{ data.company }} — {{ data.team|length }} learners on active-plan check-ins.</p>
 </section>
 
-<section class="kpi-row">
-  <!-- KPI 1: hero stat -->
-  <div class="card stat">
-    <p class="dot-title">Team check-in completion</p>
+<!-- Hero: the one number to read first -->
+<section class="card stat hero">
+  <div class="stat__main">
+    <p class="dot-title">Team check-in rate</p>
     <div class="stat__value">{{ team_pct }}%</div>
     {% if pts > 0 %}
       <span class="stat__delta stat__delta--pos">▲ {{ pts }} pt{{ '' if pts == 1 else 's' }} above company average</span>
     {% elif pts < 0 %}
       <span class="stat__delta stat__delta--neg">▼ {{ -pts }} pt{{ '' if -pts == 1 else 's' }} below company average</span>
     {% else %}
-      <span class="stat__delta" style="color:var(--fg-muted);background:var(--bg-sunken);">In line with company average</span>
+      <span class="stat__delta stat__delta--flat">In line with company average</span>
     {% endif %}
+  </div>
+  <div class="stat__aside">
     <p class="stat__foot">
       Company average <b>{{ data.company_completion | pct }}</b>.
       It weighs each learner's check-ins against the twice-weekly cadence they committed to
       (a completed plan counts as fully met). You only see your team vs. the company — never other teams' details.
     </p>
-  </div>
-
-  <!-- KPI 2: engagement bar chart -->
-  <div class="card">
-    <div class="card__head">
-      <p class="dot-title">Engagement by learner</p>
-      <span class="card__hint">Check-ins logged</span>
-    </div>
-    <div id="chart" style="min-height:300px;"></div>
   </div>
 </section>
 
@@ -61,7 +54,7 @@
 <section class="card">
   <div class="card__head">
     <p class="dot-title">Commitments &amp; progress</p>
-    <span class="card__hint">Click a column to sort · Schedule a 1:1 in one click</span>
+    <span class="card__hint">Lowest check-in rate first · red &amp; amber rows need a 1:1</span>
   </div>
   <div class="table-scroll">
     <table class="data" id="commitments">
@@ -69,24 +62,27 @@
         <tr>
           <th class="sortable" data-type="text">Learner</th>
           <th class="sortable" data-type="text">Commitment</th>
-          <th class="sortable" data-type="text">Status</th>
           <th class="sortable num" data-type="num">Check-ins</th>
-          <th class="sortable num" data-type="num">Completion</th>
+          <th class="sortable num" data-type="num">Check-in rate</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        {% for r in data.team %}
+        {# Worst-first: lowest completion surfaces the learners who need a 1:1.
+           cpct drives the bar width, its colour zone, AND the button emphasis,
+           so all three can never disagree at a threshold. #}
+        {% for r in data.team | sort(attribute="completion") %}
+        {% set cpct = (r.completion * 100) | round | int %}
+        {% set zone = "low" if cpct < 50 else ("mid" if cpct < 75 else "high") %}
         <tr>
           <td class="name-cell" data-sort="{{ r.name }}">{{ r.name }}</td>
           <td class="commit-cell" data-sort="{{ r.commitment }}">{{ r.commitment }}</td>
-          <td data-sort="{{ r.status }}"><span class="chip chip--{{ r.status }}">{{ r.status }}</span></td>
           <td class="num" data-sort="{{ r.check_ins }}">{{ r.check_ins }}</td>
           <td class="num" data-sort="{{ r.completion }}">
-            <span class="completion-bar"><span style="width:{{ (r.completion * 100) | round | int }}%"></span></span>{{ r.completion | pct }}
+            <span class="completion-bar completion-bar--{{ zone }}"><span style="width:{{ cpct }}%"></span></span>{{ r.completion | pct }}
           </td>
           <td>
-            <a class="btn btn--light btn--sm" href="{{ schedule_1on1_url(r.name, r.commitment) }}" target="_blank" rel="noopener">
+            <a class="btn {{ 'btn--solid' if cpct < 75 else 'btn--light' }} btn--sm" href="{{ schedule_1on1_url(r.name, r.commitment) }}" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4M12 13v4M10 15h4"/></svg>
               Schedule 1:1
             </a>
@@ -100,9 +96,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script id="chart-data" type="application/json">
-{{ {"labels": data.team | map(attribute="name") | list,
-    "counts": data.team | map(attribute="check_ins") | list} | tojson }}
-</script>
 <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
 {% endblock %}

@@ -70,7 +70,6 @@ def learner_row(learner, today):
         "id": learner.id,
         "name": learner.name,
         "commitment": plan.text,
-        "status": plan.status,
         "source": plan.source,
         "check_ins": actual,
         "days_active": days_active,
