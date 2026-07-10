@@ -4,11 +4,7 @@
 (function () {
   "use strict";
 
-  const STATUS_COLOR = {
-    active: "#2A77EA",
-    completed: "#659940",
-    abandoned: "#80838D",
-  };
+  const ACCENT = "#2A77EA";
   const INK_MUTED = "#4E5160";
   const LINE = "#E6E6E8";
 
@@ -19,8 +15,7 @@
     const dataEl = document.getElementById("chart-data");
     if (!el || !dataEl || typeof ApexCharts === "undefined") return;
 
-    const { labels, counts, statuses } = JSON.parse(dataEl.textContent);
-    const colors = statuses.map((s) => STATUS_COLOR[s] || STATUS_COLOR.abandoned);
+    const { labels, counts } = JSON.parse(dataEl.textContent);
     // Explicit integer headroom: keeps a uniform column (e.g. all learners at 1)
     // off the exact axis max, which otherwise renders degenerately. Counts are
     // small (0–5), so one tick per unit stays clean.
@@ -35,17 +30,16 @@
         animations: { enabled: false },
       },
       series: [{ name: "Check-ins", data: counts }],
-      colors: colors,
+      colors: [ACCENT],
       plotOptions: {
         bar: {
-          distributed: true, // color each bar by its own status
           columnWidth: "52%",
           borderRadius: 4,
           borderRadiusApplication: "end",
           dataLabels: { position: "top" },
         },
       },
-      legend: { show: false }, // we render a custom, calmer legend in HTML
+      legend: { show: false }, // single series — the card title names it
       dataLabels: {
         enabled: true,
         offsetY: -18,
@@ -84,16 +78,12 @@
       tooltip: {
         custom: ({ dataPointIndex }) => {
           const name = labels[dataPointIndex];
-          const status = statuses[dataPointIndex];
           const n = counts[dataPointIndex];
-          const color = STATUS_COLOR[status] || STATUS_COLOR.abandoned;
           return (
             '<div style="padding:9px 12px;font-family:inherit;">' +
             '<div style="font-weight:600;margin-bottom:2px;">' + name + "</div>" +
             '<div style="font-size:12px;color:#4E5160;">' +
-            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' +
-            color + ';margin-right:6px;"></span>' +
-            n + " check-in" + (n === 1 ? "" : "s") + " · " + status +
+            n + " check-in" + (n === 1 ? "" : "s") +
             "</div></div>"
           );
         },

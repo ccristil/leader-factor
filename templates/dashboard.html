@@ -54,11 +54,6 @@
       <span class="card__hint">Check-ins logged</span>
     </div>
     <div id="chart" style="min-height:300px;"></div>
-    <div class="chart-legend">
-      <span class="legend-item"><span class="legend-swatch" style="background:var(--status-active)"></span>Active</span>
-      <span class="legend-item"><span class="legend-swatch" style="background:var(--status-completed)"></span>Completed</span>
-      <span class="legend-item"><span class="legend-swatch" style="background:var(--status-abandoned)"></span>Abandoned</span>
-    </div>
   </div>
 </section>
 
@@ -107,8 +102,7 @@
 {% block scripts %}
 <script id="chart-data" type="application/json">
 {{ {"labels": data.team | map(attribute="name") | list,
-    "counts": data.team | map(attribute="check_ins") | list,
-    "statuses": data.team | map(attribute="status") | list} | tojson }}
+    "counts": data.team | map(attribute="check_ins") | list} | tojson }}
 </script>
 <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
 {% endblock %}

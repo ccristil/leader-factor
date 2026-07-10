@@ -17,11 +17,6 @@
   --accent: #2A77EA;          /* PS blue — the single accent */
   --accent-deep: #225BB0;
 
-  /* status encoding for the chart + chips (validated: blue/green CVD-safe) */
-  --status-active: #2A77EA;
-  --status-completed: #659940;
-  --status-abandoned: #80838D;
-
   --pos: #4E7333;             /* above company average */
   --neg: #C0472A;             /* below company average */
 
@@ -182,21 +177,6 @@ a { color: inherit; }
 .stat__foot b { color: var(--fg); font-weight: 600; }
 
 /* ---- KPI #2: chart ------------------------------------------------------- */
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 4px;
-}
-.legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12.5px;
-  color: var(--fg-muted);
-}
-.legend-swatch { width: 11px; height: 11px; border-radius: 3px; }
 
 /* ---- chips (status) ------------------------------------------------------ */
 
